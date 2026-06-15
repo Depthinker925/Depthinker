@@ -1,4 +1,0 @@
-[build]
-builder = "npm"
-command = "npm run build"
-output_dir = "dist"
