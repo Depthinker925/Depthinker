@@ -1,0 +1,596 @@
+/* Trimmed to the rules the surviving code can apply. */
+
+.dtimer-view {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+/* The mode, written small. Both states give it the same box — same size, same padding,
+   same line height — so swapping the word cannot change the panel's height. Only the
+   colour and the cursor change: pressable while idle, a plain label while running. */
+.dtimer-phase {
+	display: block;
+	padding: 1px 0;
+	text-align: center;
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-semibold);
+	line-height: 1.5;
+	color: var(--text-normal);
+}
+
+.dtimer-phase.dtimer-phase-switch {
+	color: var(--text-muted);
+	cursor: pointer;
+	user-select: none;
+	transition: color 120ms ease;
+}
+
+.dtimer-phase.dtimer-phase-switch:hover,
+.dtimer-phase.dtimer-phase-switch:focus-visible {
+	color: var(--text-normal);
+}
+
+.dtimer-phase.dtimer-phase-switch:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
+/* A full circle. It is the same size in every state, which is what keeps the panel from
+   moving when a session starts. */
+.dtimer-gauge {
+	position: relative;
+	width: 100%;
+	max-width: 196px;
+	aspect-ratio: 1;
+	margin: var(--size-4-2) auto var(--size-4-3);
+}
+
+.dtimer-ring {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.dtimer-ring-track {
+	fill: none;
+	stroke: var(--background-modifier-border);
+	stroke-width: 8;
+}
+
+.dtimer-ring-progress {
+	fill: none;
+	stroke: var(--interactive-accent);
+	stroke-width: 8;
+	stroke-linecap: round;
+	transition: stroke-dashoffset 0.4s linear;
+}
+
+/* The clock sits in the middle of the circle and is the only control: press it to start
+   a session, press it again to end one. */
+.dtimer-time {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.9em;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	font-weight: var(--font-bold);
+	color: var(--text-normal);
+	cursor: pointer;
+	user-select: none;
+	border-radius: 50%;
+	transition: color 0.15s ease;
+}
+
+/* Hovering the clock changes its colour.
+   The colour deliberately comes from --text-accent and NOT from --interactive-accent:
+   some themes remap --interactive-accent onto a neutral base colour, and in Obsidian's
+   dark theme --text-normal is that same base colour. Baseline does exactly this
+   (`body:not(.accented-interface) { --interactive-accent: var(--color-base-100) }`), so
+   hovering would "change" the digits to the colour they already had and nothing would
+   appear to happen. --text-accent keeps pointing at the real accent in those themes. */
+.dtimer-time:hover,
+.dtimer-time:focus-visible {
+	color: var(--text-accent, var(--color-accent, #7f6df2));
+}
+
+.dtimer-time:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: -8px;
+}
+
+.dtimer-btn {
+	flex: 1 1 auto;
+	min-height: 44px;
+	padding: var(--size-2-2) var(--size-4-2);
+	border: none;
+	background: none;
+	color: var(--text-muted);
+	cursor: pointer;
+	font-size: var(--font-ui-small);
+	transition: color 120ms ease;
+}
+
+.dtimer-btn:hover {
+	color: var(--text-normal);
+}
+
+.dtimer-btn-primary {
+	color: var(--interactive-accent);
+	font-weight: var(--font-semibold);
+}
+
+.dtimer-btn-primary:hover {
+	color: var(--interactive-accent-hover);
+}
+
+.dtimer-btn-danger {
+	color: var(--text-error);
+}
+
+.dtimer-recovery {
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	padding: var(--size-4-2);
+	margin-bottom: var(--size-4-2);
+}
+
+.dtimer-recovery-title {
+	font-weight: var(--font-semibold);
+	color: var(--text-normal);
+}
+
+.dtimer-recovery-body {
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	margin: var(--size-2-1) 0 var(--size-4-1);
+}
+
+.dtimer-recovery-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-2-2) var(--size-4-3);
+}
+
+.dtimer-stats {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--size-2-2);
+	margin-bottom: var(--size-4-3);
+}
+
+.dtimer-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: var(--size-4-1);
+	background: var(--background-secondary);
+	border-radius: var(--radius-s);
+}
+
+.dtimer-stat-value {
+	font-size: var(--font-ui-large);
+	font-weight: var(--font-bold);
+	color: var(--text-normal);
+}
+
+.dtimer-stat-label {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.dtimer-splitstats {
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	padding: var(--size-4-2);
+	margin-bottom: var(--size-4-3);
+}
+
+.dtimer-splitstats-title {
+	font-weight: var(--font-semibold);
+	color: var(--text-normal);
+	margin-bottom: var(--size-2-2);
+}
+
+.dtimer-splitstats-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--size-4-2);
+}
+
+.dtimer-splitstats-col {
+	min-width: 0;
+}
+
+.dtimer-splitstats-col-title {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	margin-bottom: var(--size-2-1);
+}
+
+.dtimer-splitstats-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.dtimer-splitstats-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--size-2-1) var(--size-2-2);
+}
+
+.dtimer-splitstats-label {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	white-space: nowrap;
+}
+
+.dtimer-splitstats-value {
+	color: var(--text-normal);
+	font-weight: var(--font-semibold);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.dtimer-cal-nav {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	margin-bottom: var(--size-4-2);
+}
+
+.dtimer-cal-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 32px;
+	min-height: 32px;
+	padding: var(--size-2-1);
+	border: none;
+	background: none;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: color 120ms ease;
+}
+
+.dtimer-cal-btn:hover {
+	color: var(--text-normal);
+}
+
+.dtimer-cal-label {
+	flex: 1;
+	text-align: center;
+	font-weight: var(--font-semibold);
+	color: var(--text-normal);
+}
+
+.dtimer-cal-today {
+	padding: var(--size-2-1) var(--size-4-2);
+}
+
+.dtimer-cal-weekdays {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: var(--size-2-1);
+	margin-bottom: var(--size-2-1);
+}
+
+.dtimer-cal-weekday {
+	text-align: center;
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.dtimer-cal-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: var(--size-2-1);
+}
+
+.dtimer-day {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	padding: var(--size-2-1);
+	border-radius: var(--radius-s);
+	background: var(--background-secondary);
+	cursor: pointer;
+	color: var(--text-normal);
+}
+
+.dtimer-day-blank {
+	background: transparent;
+	cursor: default;
+}
+
+.dtimer-day-today {
+	outline: 1px solid var(--interactive-accent);
+}
+
+.dtimer-day-num {
+	font-size: var(--font-ui-small);
+}
+
+.dtimer-detail-total {
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	margin-bottom: var(--size-2-2);
+}
+
+.dtimer-detail-rest-total {
+	color: var(--text-faint);
+}
+
+.dtimer-detail-empty {
+	font-size: var(--font-ui-small);
+	color: var(--text-faint);
+}
+
+.dtimer-session-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.dtimer-session {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--size-2-2);
+	background: var(--background-secondary);
+	border-radius: var(--radius-s);
+}
+
+.dtimer-session-rest {
+	border-left: 3px solid var(--interactive-accent);
+}
+
+.dtimer-session-info {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.dtimer-session-range {
+	color: var(--text-normal);
+	font-variant-numeric: tabular-nums;
+}
+
+.dtimer-session-meta {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.dtimer-session-actions {
+	display: flex;
+	gap: var(--size-2-1);
+}
+
+.dtimer-icon-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 32px;
+	min-height: 32px;
+	border: none;
+	background: transparent;
+	color: var(--text-muted);
+	border-radius: var(--radius-s);
+	cursor: pointer;
+}
+
+.dtimer-icon-btn:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.dtimer-icon-danger:hover {
+	color: var(--text-error);
+}
+
+.dtimer-hidden {
+	display: none;
+}
+
+/* The mode sits under the circle. It is the only text in the panel, and it is the same
+   single line in both states, so swapping "Pomodoro" for the focus phase moves nothing. */
+.dtimer-modelabel {
+	text-align: center;
+	margin-top: var(--size-2-2);
+}
+
+.dep-report-box {
+	margin-bottom: var(--size-4-6);
+}
+
+.dep-report-title {
+	font-weight: var(--font-bold);
+	color: var(--text-normal);
+	margin-bottom: var(--size-4-3);
+}
+
+/* Spacing between the seven-day chart and the month calendar below it. */
+.dep-calendar-box {
+	margin-top: var(--size-4-5);
+}
+
+.dep-report-stats {
+	display: flex;
+	gap: var(--size-4-4);
+	margin-bottom: var(--size-4-3);
+}
+
+.dep-report-stat {
+	flex: 1;
+}
+
+.dep-report-stat-value {
+	font-weight: 700;
+	color: var(--text-normal);
+	font-size: 1.4em;
+	font-variant-numeric: tabular-nums;
+}
+
+.dep-report-stat-label {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	margin-top: var(--size-2-1);
+	letter-spacing: 0.06em;
+}
+
+.dep-report-chart {
+	display: flex;
+	align-items: flex-end;
+	gap: var(--size-2-2);
+	height: 140px;
+	padding: var(--size-3-1) 0 0;
+}
+
+.dep-report-col {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+	height: 100%;
+	gap: var(--size-2-2);
+}
+
+.dep-report-value {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+	font-variant-numeric: tabular-nums;
+}
+
+.dep-report-bar-wrap {
+	width: 100%;
+	flex: 1;
+	display: flex;
+	align-items: flex-end;
+}
+
+.dep-report-bar {
+	width: 100%;
+	height: var(--dep-report-bar-height, 0%);
+	border-radius: 2px 2px 0 0;
+	background: var(--interactive-accent);
+	opacity: 0.55;
+	min-height: 2px;
+	transition: opacity 160ms ease;
+}
+
+.dep-report-col:hover .dep-report-bar {
+	opacity: 0.9;
+}
+
+.dep-report-bar-today {
+	opacity: 1;
+}
+
+.dep-report-day {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.dep-status {
+	font-variant-numeric: tabular-nums;
+}
+
+.dep-sidebar-view {
+	height: 100%;
+	box-sizing: border-box;
+	overflow-y: auto;
+	padding: var(--size-4-2, 8px) var(--size-4-2, 8px) var(--size-4-8, 32px);
+}
+
+.dep-sidebar-section + .dep-sidebar-section {
+	margin-top: var(--size-4-5);
+	padding-top: var(--size-4-4);
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.dep-sidebar-body .dtimer-view {
+	height: auto;
+	width: 100%;
+}
+
+.dtimer-day-dot {
+	display: block;
+	width: 8px;
+	height: 8px;
+	margin: 3px auto 0;
+	border-radius: 50%;
+	background: var(--interactive-accent);
+	opacity: 0;
+	transform: scale(0.5);
+	transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.dep-day-modal {
+	min-width: 320px;
+}
+
+.dep-day-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-2-3);
+	margin-bottom: var(--size-4-3);
+}
+
+.dep-day-btn {
+	padding: var(--size-2-3) var(--size-4-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	cursor: pointer;
+	transition: background 120ms ease, border-color 120ms ease;
+}
+
+.dep-day-btn:hover {
+	background: var(--background-modifier-hover);
+	border-color: var(--interactive-accent);
+}
+
+.dep-day-btn-diary {
+	border-color: var(--interactive-accent);
+	color: var(--text-accent);
+}
+
+@media (max-width: 500px) {
+.dtimer-gauge {
+		max-width: 160px;
+	
+}
+.dtimer-time {
+		font-size: 1.7em;
+	
+}
+.dtimer-stats {
+		grid-template-columns: repeat(2, 1fr);
+	
+}
+.dtimer-day {
+		min-height: 40px;
+	
+}
+}
+
+@media (max-width: 600px) {
+.dep-report-stats {
+		flex-direction: column;
+	
+}
+}

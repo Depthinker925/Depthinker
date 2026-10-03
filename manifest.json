@@ -1,0 +1,9 @@
+{
+  "id": "depthinker",
+  "name": "Depthinker",
+  "version": "2.0.0",
+  "minAppVersion": "1.13.0",
+  "description": "A focus timer in the right sidebar, with a seven-day chart, a month calendar of your focus, and one press into that day's diary note",
+  "author": "Depthinker",
+  "isDesktopOnly": true
+}
